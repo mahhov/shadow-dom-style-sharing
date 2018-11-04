@@ -98,15 +98,15 @@
 
       .part cannot be followed by further selectors (since we assume whatever
       follows is the part identifier); e.g. `.part .x.y .z` is assumed to search
-      for `<w part=".x.y .z">`
+      for `<w part=".x.y .z">, unless using .pend to indicate where .part's
+      parameter ends
     */
 
 	// todo
-	// support comma separated rules, e.g. .theme button, .theme checkbox
 	// check :host is correctly applies <link> rules
-	// support chaining rules, e.g. div.container.theme.first-row
 	// iterate all style sheets, not just document's style sheet
 	// support dynamic run time application of .theme and .part to new shadow dom's added or new style rules added
+	// support ::theme and ::part() instead of .theme, .part, and .pend
 </script>
 
 <!-- usage -->
