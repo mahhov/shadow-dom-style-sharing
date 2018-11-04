@@ -1,48 +1,111 @@
 <!-- implements support for `::part` and `::theme` -->
 <script>
-	let selectShadowRoots = (root, select) =>
-		[...root.querySelectorAll(select)]
-			.flatMap(match => [...match.querySelectorAll('*')])
-			.filter(element => element.shadowRoot)
-			.map(element => element.shadowRoot);
+	{
+		// given a list of roots, returns new roots that match a select query within those roots
+		let queryRoots = (roots, select) =>
+			roots.flatMap(root => [...root.querySelectorAll(select)]);
 
-	let getShadowRootEditStyle = shadowRoot => {
-		if (shadowRoot.editStyle)
-			return shadowRoot.editStyle;
-		shadowRoot.appendChild(document.createElement('style'));
-		return shadowRoot.editStyle = shadowRoot.styleSheets[0];
-	};
+		// given a list of roots, returns the shadowRoots of all the roots that have shadowRoots
+		let getShadowRoots = roots =>
+			roots
+				.filter(element => element.shadowRoot)
+				.map(element => element.shadowRoot);
 
-	document.addEventListener('DOMContentLoaded', () => {
-		[...document.styleSheets]
-			.flatMap(styleSheet => [...styleSheet.rules])
-			.forEach(rule => {
-				if (!rule.selectorText)
-					return;
-				if (!/\.(theme|part)[^\w-]/.test(rule.selectorText))
-					return;
+		// given a list of roots, returns direct decedent shadowRoots nested within the roots
+		let selectDirectShadowRoots = roots =>
+			roots.flatMap(root => getShadowRoots([...root.querySelectorAll('*')]));
 
-				let styleText = rule.cssText.match(/{(.*)}/)[1];
+		// given a list of roots, returns decedent shadowRoots nested within the roots
+		let selectShadowRoots = roots => {
+			roots = selectDirectShadowRoots(roots);
+			for (let i = 0; i < roots.length; i++)
+				roots.push(...selectDirectShadowRoots([roots[i]]));
+			return roots;
+		};
 
-				rule.selectorText.split(',').forEach(subSelectorText => {
-					let shadowSelects = subSelectorText.split(/(\.(?:part|theme))/);
-					let roots = [document];
-					shadowSelects.forEach(select => {
-						switch (select) {
-							case '.theme':
-								roots = roots.flatMap(root => selectShadowRoots(root, select));
-								break;
-							case '.part':
-								break;
-							default:
-								roots = roots.flatMap(root => root.querySelectorAll(select));
-						}
+		// given a shadowRoot, gives the edit style of the shadowRoot
+		let getShadowRootEditStyle = shadowRoot => {
+			if (shadowRoot.editStyle)
+				return shadowRoot.editStyle;
+			shadowRoot.appendChild(document.createElement('style'));
+			return shadowRoot.editStyle = shadowRoot.styleSheets[0];
+		};
+
+		document.addEventListener('DOMContentLoaded', () => {
+			[...document.styleSheets]
+				.flatMap(styleSheet => [...styleSheet.rules])
+				.forEach(rule => {
+					if (!rule.selectorText)
+						return;
+
+					if (!/\.(theme|pend|part)[^\w-]/.test(rule.selectorText))
+						return;
+
+					let styleText = rule.cssText.match(/{(.*)}/)[1];
+
+					rule.selectorText.split(',').forEach(subSelectorText => {
+						console.log(subSelectorText);
+
+						let shadowSelects = subSelectorText
+							.split(/(\.(?:theme|pend|part))/)
+							.map(select => select.trim())
+							.filter(select => select);
+
+						if (shadowSelects.length <= 1)
+							return;
+
+						let roots = [document];
+						let remainderPartSelector;
+						let skip = 0;
+
+						shadowSelects.forEach((select, i) => {
+							console.log('>', select, skip)
+
+							if (skip) {
+								skip--;
+								return;
+							}
+
+							if (remainderPartSelector)
+								roots = queryRoots(roots, remainderPartSelector);
+
+							let nextSelect = shadowSelects[i + 1] || '';
+
+							switch (select) {
+								case '.theme':
+									roots = selectShadowRoots(roots);
+									break;
+								case '.part':
+									remainderPartSelector = `[part=${nextSelect}]`;
+									skip += 2;
+									roots = getShadowRoots(roots);
+									break;
+								default:
+									remainderPartSelector = select;
+							}
+						});
+
+						console.log('>>', remainderPartSelector)
+						console.log('>>', roots)
+
+						roots
+							.map(getShadowRootEditStyle)
+							.forEach(styleSheet => styleSheet.addRule(remainderPartSelector, styleText));
 					});
-
-					shadowRootsStyleSheets.forEach(styleSheet => styleSheet.addRule(shadowSelect, styleText));
 				});
-			});
-	});
+		});
+	}
+
+	/*
+      LIMITATIONS
+
+      must use `.part` instead of `::part`, and `.theme` instead of `::theme`
+      as the browser prunes out invalid css rules form the `StyleSheetList`'s.
+
+      .part cannot be followed by further selectors (since we assume whatever
+      follows is the part identifier); e.g. `.part .x.y .z` is assumed to search
+      for `<w part=".x.y .z">`
+    */
 
 	// todo
 	// support comma separated rules, e.g. .theme button, .theme checkbox
@@ -56,39 +119,61 @@
 
 <style>
 	.theme .line-orange,
-	.theme .line-orange-2 {
+	.theme .line-orange-2,
+	.line-orange,
+	.line-orange-2 {
 		border: 1px solid orange;
 		color: orange;
 	}
 
-	/*.my-element.part line-green, .my-element.part line-green-2 {*/
-	/*border: 1px solid green;*/
-	/*color: green;*/
-	/*}*/
+	my-element .part line-green,
+	my-element .part line-green-2,
+	.line-green,
+	.line-green-2 {
+		border: 1px solid green;
+		color: green;
+	}
 
-	/*
-	  must use `.part` instead of `::part`, and `.theme` instead of `::theme`
-	  as the browser prunes out invalid css rules form the `StyleSheetList`'s.
-	*/
+	my-element .part nested .pend .part line-green,
+	my-element .part nested .pend .part line-green-2,
+	my-element .part nested-div .pend .line-red {
+		border: 1px solid red;
+		color: red;
+	}
+
 </style>
 
 <template id="my-template">
 	<p part="line-green">green</p>
-	<p part="line-green-2">green</p>
+	<p part="line-green-2">green 2</p>
 	<p class="line-orange">orange</p>
-	<p class="line-orang-2">orange</p>
+	<p class="line-orange-2">orange 2</p>
+	<my-element-2 part="nested"></my-element-2>
+	<div part="nested-div">
+		<p>normal</p>
+		<p class="line-red">red</p>
+	</div>
 </template>
 
-<p>custom element</p>
+<template id="my-element-2">
+	<h3>i'm nested</h3>
+	<p part="line-green">red</p>
+	<p part="line-green-2">red 2</p>
+	<p class="line-orange">orange</p>
+	<p class="line-orange-2">orange 2</p>
+	<p>end nesting</p>
+</template>
+
+<h3>custom element</h3>
 
 <my-element></my-element>
 
-<p>inline element</p>
+<h3>inline element</h3>
 
-<p part="line-green">green</p>
-<p part="line-green-2">green</p>
+<p class="line-green">green</p>
+<p class="line-green-2">green 2</p>
 <p class="line-orange">orange</p>
-<p class="line-orang-2e">orange</p>
+<p class="line-orange-2">orange</p>
 
 <script>
 	customElements.define('my-element', class extends HTMLElement {
@@ -96,6 +181,15 @@
 			super();
 			this.attachShadow({mode: 'open'});
 			const template = document.getElementById('my-template').content.cloneNode(true);
+			this.shadowRoot.appendChild(template);
+		}
+	});
+
+	customElements.define('my-element-2', class extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({mode: 'open'});
+			const template = document.getElementById('my-element-2').content.cloneNode(true);
 			this.shadowRoot.appendChild(template);
 		}
 	});
