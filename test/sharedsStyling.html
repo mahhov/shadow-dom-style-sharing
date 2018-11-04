@@ -1,0 +1,63 @@
+<!-- implements support for `::part` and `::theme` -->
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		// create style sheets for each shadow root to which we will later add rules
+		let shadowRootsStyleSheets = [...document.querySelectorAll('*')]
+			.filter(element => element.shadowRoot)
+			.map(element => element.shadowRoot)
+			.map(shadowRoot => {
+				shadowRoot.appendChild(document.createElement('style'));
+				return shadowRoot.styleSheets[0];
+			});
+
+		// iterate all style rules in the document searching for `.theme` and `.part` in the selectors.
+		[...document.styleSheets]
+			.flatMap(styleSheet => [...styleSheet.rules])
+			.forEach(rule => {
+				let styleText = rule.cssText.match(/\{(.*)\}/)[1];
+
+				let match;
+				if (match = rule.selectorText.match(/\.theme\b(.*)/))
+					shadowRootsStyleSheets.forEach(styleSheet => styleSheet.addRule(match[1], styleText));
+				else if (match = rule.selectorText.match(/\.part\b(.*)/))
+					shadowRootsStyleSheets.forEach(styleSheet => styleSheet.addRule(`[part=${match[1]}]`, styleText));
+			});
+	});
+</script>
+
+<!-- usage -->
+
+<style>
+	.my-element.part line-green {
+		border: 1px solid green;
+		color: green;
+	}
+
+	.theme .line-orange {
+		border: 1px solid orange;
+		color: orange;
+	}
+
+	/*
+      must use `.part` instead of `::part`, and `.theme` instead of `::theme`
+      as the browser prunes out invalid css rules form the `StyleSheetList`'s.
+    */
+</style>
+
+<template id="my-template">
+	<p part="line-green">green</p>
+	<p class="line-orange">orange</p>
+</template>
+
+<my-element></my-element>
+
+<script>
+	customElements.define('my-element', class extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({mode: 'open'});
+			const template = document.getElementById('my-template').content.cloneNode(true);
+			this.shadowRoot.appendChild(template);
+		}
+	});
+</script>
