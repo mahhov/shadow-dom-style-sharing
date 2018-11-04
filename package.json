@@ -1,0 +1,17 @@
+{
+  "name": "shadow-dom-style-sharing",
+  "version": "1.0.0",
+  "description": "polyfill ::part and ::theme",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [
+    "css",
+    "shadowdom",
+    "style",
+    "part",
+    "theme"
+  ],
+  "author": "",
+  "license": "ISC"
+}
