@@ -44,8 +44,6 @@
 					let styleText = rule.cssText.match(/{(.*)}/)[1];
 
 					rule.selectorText.split(',').forEach(subSelectorText => {
-						console.log(subSelectorText);
-
 						let shadowSelects = subSelectorText
 							.split(/(\.(?:theme|pend|part))/)
 							.map(select => select.trim())
@@ -55,38 +53,34 @@
 							return;
 
 						let roots = [document];
-						let remainderPartSelector;
+						let remainderPartSelector = '';
 						let skip = 0;
 
 						shadowSelects.forEach((select, i) => {
-							console.log('>', select, skip)
-
 							if (skip) {
 								skip--;
 								return;
 							}
 
-							if (remainderPartSelector)
-								roots = queryRoots(roots, remainderPartSelector);
-
 							let nextSelect = shadowSelects[i + 1] || '';
 
 							switch (select) {
 								case '.theme':
+									if (remainderPartSelector)
+										roots = queryRoots(roots, remainderPartSelector);
 									roots = selectShadowRoots(roots);
 									break;
 								case '.part':
+									if (remainderPartSelector)
+										roots = queryRoots(roots, remainderPartSelector);
 									remainderPartSelector = `[part=${nextSelect}]`;
 									skip += 2;
 									roots = getShadowRoots(roots);
 									break;
 								default:
-									remainderPartSelector = select;
+									remainderPartSelector += ' ' + select;
 							}
 						});
-
-						console.log('>>', remainderPartSelector)
-						console.log('>>', roots)
 
 						roots
 							.map(getShadowRootEditStyle)
@@ -161,7 +155,6 @@
 	<p part="line-green-2">red 2</p>
 	<p class="line-orange">orange</p>
 	<p class="line-orange-2">orange 2</p>
-	<p>end nesting</p>
 </template>
 
 <h3>custom element</h3>
