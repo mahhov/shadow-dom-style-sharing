@@ -1,55 +1,94 @@
 <!-- implements support for `::part` and `::theme` -->
 <script>
-	document.addEventListener('DOMContentLoaded', () => {
-		// create style sheets for each shadow root to which we will later add rules
-		let shadowRootsStyleSheets = [...document.querySelectorAll('*')]
+	let selectShadowRoots = (root, select) =>
+		[...root.querySelectorAll(select)]
+			.flatMap(match => [...match.querySelectorAll('*')])
 			.filter(element => element.shadowRoot)
-			.map(element => element.shadowRoot)
-			.map(shadowRoot => {
-				shadowRoot.appendChild(document.createElement('style'));
-				return shadowRoot.styleSheets[0];
-			});
+			.map(element => element.shadowRoot);
 
-		// iterate all style rules in the document searching for `.theme` and `.part` in the selectors.
+	let getShadowRootEditStyle = shadowRoot => {
+		if (shadowRoot.editStyle)
+			return shadowRoot.editStyle;
+		shadowRoot.appendChild(document.createElement('style'));
+		return shadowRoot.editStyle = shadowRoot.styleSheets[0];
+	};
+
+	document.addEventListener('DOMContentLoaded', () => {
 		[...document.styleSheets]
 			.flatMap(styleSheet => [...styleSheet.rules])
 			.forEach(rule => {
-				let styleText = rule.cssText.match(/\{(.*)\}/)[1];
+				if (!rule.selectorText)
+					return;
+				if (!/\.(theme|part)[^\w-]/.test(rule.selectorText))
+					return;
 
-				let match;
-				if (match = rule.selectorText.match(/\.theme\b(.*)/))
-					shadowRootsStyleSheets.forEach(styleSheet => styleSheet.addRule(match[1], styleText));
-				else if (match = rule.selectorText.match(/\.part\b(.*)/))
-					shadowRootsStyleSheets.forEach(styleSheet => styleSheet.addRule(`[part=${match[1]}]`, styleText));
+				let styleText = rule.cssText.match(/{(.*)}/)[1];
+
+				rule.selectorText.split(',').forEach(subSelectorText => {
+					let shadowSelects = subSelectorText.split(/(\.(?:part|theme))/);
+					let roots = [document];
+					shadowSelects.forEach(select => {
+						switch (select) {
+							case '.theme':
+								roots = roots.flatMap(root => selectShadowRoots(root, select));
+								break;
+							case '.part':
+								break;
+							default:
+								roots = roots.flatMap(root => root.querySelectorAll(select));
+						}
+					});
+
+					shadowRootsStyleSheets.forEach(styleSheet => styleSheet.addRule(shadowSelect, styleText));
+				});
 			});
 	});
+
+	// todo
+	// support comma separated rules, e.g. .theme button, .theme checkbox
+	// check :host is correctly applies <link> rules
+	// support chaining rules, e.g. div.container.theme.first-row
+	// iterate all style sheets, not just document's style sheet
+	// support dynamic run time application of .theme and .part to new shadow dom's added or new style rules added
 </script>
 
 <!-- usage -->
 
 <style>
-	.my-element.part line-green {
-		border: 1px solid green;
-		color: green;
-	}
-
-	.theme .line-orange {
+	.theme .line-orange,
+	.theme .line-orange-2 {
 		border: 1px solid orange;
 		color: orange;
 	}
 
+	/*.my-element.part line-green, .my-element.part line-green-2 {*/
+	/*border: 1px solid green;*/
+	/*color: green;*/
+	/*}*/
+
 	/*
-      must use `.part` instead of `::part`, and `.theme` instead of `::theme`
-      as the browser prunes out invalid css rules form the `StyleSheetList`'s.
-    */
+	  must use `.part` instead of `::part`, and `.theme` instead of `::theme`
+	  as the browser prunes out invalid css rules form the `StyleSheetList`'s.
+	*/
 </style>
 
 <template id="my-template">
 	<p part="line-green">green</p>
+	<p part="line-green-2">green</p>
 	<p class="line-orange">orange</p>
+	<p class="line-orang-2">orange</p>
 </template>
 
+<p>custom element</p>
+
 <my-element></my-element>
+
+<p>inline element</p>
+
+<p part="line-green">green</p>
+<p part="line-green-2">green</p>
+<p class="line-orange">orange</p>
+<p class="line-orang-2e">orange</p>
 
 <script>
 	customElements.define('my-element', class extends HTMLElement {
