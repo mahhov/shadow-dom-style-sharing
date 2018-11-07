@@ -36,14 +36,14 @@
 				if (!rule.selectorText)
 					return;
 
-				if (!/\.(theme|pend|part)[^\w-]/.test(rule.selectorText))
+				if (!/\.(theme|part)[^\w-]/.test(rule.selectorText))
 					return;
 
 				let styleText = rule.cssText.match(/{(.*)}/)[1];
 
 				rule.selectorText.split(',').forEach(subSelectorText => {
 					let shadowSelects = subSelectorText
-						.split(/(\.(?:theme|pend|part))/)
+						.split(/(\.(?:theme|partend|part))/)
 						.map(select => select.trim())
 						.filter(select => select);
 
