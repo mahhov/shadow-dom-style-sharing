@@ -4,14 +4,18 @@
   "description": "polyfill ::part and ::theme",
   "main": "index.js",
   "scripts": {
+	"readme": "document ./readmeTemplate.md ./readme.md"
   },
   "keywords": [
-    "css",
-    "shadowdom",
-    "style",
-    "part",
-    "theme"
+	"css",
+	"shadowdom",
+	"style",
+	"part",
+	"theme"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+	"de-document-examples": "0.0.9"
+  }
 }

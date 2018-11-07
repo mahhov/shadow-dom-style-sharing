@@ -1,0 +1,52 @@
+<!-- styling -->
+
+<style>
+	.theme .line-orange {
+		color: orange;
+		border: 1px solid orange;
+	}
+</style>
+
+<!-- html -->
+
+<p class="line-orange">inline black</p>
+
+<my-element></my-element>
+
+<template id="my-template">
+	<p class="line-orange">element orange</p>
+	<my-element-nested part="nested-element"></my-element-nested>
+	<div part="nested-div">
+		<p class="line-orange">nested div orange</p>
+	</div>
+</template>
+
+<template id="my-element-nested">
+	<p class="line-orange">nested element orange</p>
+</template>
+
+<!-- set up custom elements -->
+
+<script>
+	customElements.define('my-element', class extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({mode: 'open'});
+			const template = document.getElementById('my-template').content.cloneNode(true);
+			this.shadowRoot.appendChild(template);
+		}
+	});
+
+	customElements.define('my-element-nested', class extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({mode: 'open'});
+			const template = document.getElementById('my-element-nested').content.cloneNode(true);
+			this.shadowRoot.appendChild(template);
+		}
+	});
+</script>
+
+<!-- apply shared css styling -->
+
+<script src="../src/index.js"></script>
