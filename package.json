@@ -4,7 +4,8 @@
   "description": "polyfill ::part and ::theme",
   "main": "index.js",
   "scripts": {
-	"readme": "document ./readmeTemplate.md ./readme.md"
+	"readme": "document ./readmeTemplate.md ./readme.md",
+	"postversion": "git push && git push --tags && npm publish"
   },
   "keywords": [
 	"css",
@@ -13,9 +14,21 @@
 	"part",
 	"theme"
   ],
-  "author": "",
+  "author": "mahhov",
   "license": "ISC",
   "devDependencies": {
 	"de-document-examples": "0.0.9"
-  }
+  },
+  "directories": {
+	"test": "test"
+  },
+  "dependencies": {},
+  "repository": {
+	"type": "git",
+	"url": "git+https://github.com/mahhov/shadow-dom-style-sharing.git"
+  },
+  "bugs": {
+	"url": "https://github.com/mahhov/shadow-dom-style-sharing/issues"
+  },
+  "homepage": "https://github.com/mahhov/shadow-dom-style-sharing#readme"
 }
