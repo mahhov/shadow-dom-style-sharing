@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   .part cannot be followed by further selectors (since we assume whatever
   follows is the part identifier); e.g. `.part .x.y .z` is assumed to search
-  for `<w part=".x.y .z">, unless using .pend to indicate where .part's
+  for `<w part=".x.y .z">, unless using .partend to indicate where .part's
   parameter ends
 */
 
@@ -102,4 +102,4 @@ document.addEventListener('DOMContentLoaded', () => {
 // check :host is correctly applies <link> rules
 // iterate all style sheets, not just document's style sheet
 // support dynamic run time application of .theme and .part to new shadow dom's added or new style rules added
-// support ::theme and ::part() instead of .theme, .part, and .pend
+// support ::theme and ::part() instead of .theme, .part, and .partend

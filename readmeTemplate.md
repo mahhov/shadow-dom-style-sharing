@@ -28,7 +28,7 @@ see `https://meowni.ca/posts/part-theme-explainer/` for more information on thes
 
 ### syntax
 
-at the moment, to avoid having to re-parse the css styling, we reuse the browser's parsed `document.styleSheets`. Unfortunately, browsers prune invalid `css` when generating `document.styleSheets`. This means we're unable to use custom pseudo-selectors such as `::theme` and `::part`, and instead use the `.theme` and `.part` syntax. Furthermore, as class selectors, e.g. `.part`, can't have parenthetical parameters, we must use `.pend` to indicate the end of .part, otherwise it will be assumed to end at the next `.theme`, `.part`, or `;`.
+at the moment, to avoid having to re-parse the css styling, we reuse the browser's parsed `document.styleSheets`. Unfortunately, browsers prune invalid `css` when generating `document.styleSheets`. This means we're unable to use custom pseudo-selectors such as `::theme` and `::part`, and instead use the `.theme` and `.part` syntax. Furthermore, as class selectors, e.g. `.part`, can't have parenthetical parameters, we must use `.partend` to indicate the end of .part, otherwise it will be assumed to end at the next `.theme`, `.part`, or `;`.
 
 ## example
 
