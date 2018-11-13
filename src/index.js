@@ -1,92 +1,90 @@
-{
-	// given a list of roots, returns new roots that match a select query within those roots
-	let queryRoots = (roots, select) =>
-		roots.flatMap(root => [...root.querySelectorAll(select)]);
+// given a list of roots, returns new roots that match a select query within those roots
+let queryRoots = (roots, select) =>
+	roots.flatMap(root => [...root.querySelectorAll(select)]);
 
-	// given a list of roots, returns the shadowRoots of all the roots that have shadowRoots
-	let getShadowRoots = roots =>
-		roots
-			.filter(element => element.shadowRoot)
-			.map(element => element.shadowRoot);
+// given a list of roots, returns the shadowRoots of all the roots that have shadowRoots
+let getShadowRoots = roots =>
+	roots
+		.filter(element => element.shadowRoot)
+		.map(element => element.shadowRoot);
 
-	// given a list of roots, returns direct decedent shadowRoots nested within the roots
-	let selectDirectShadowRoots = roots =>
-		roots.flatMap(root => getShadowRoots([...root.querySelectorAll('*')]));
+// given a list of roots, returns direct decedent shadowRoots nested within the roots
+let selectDirectShadowRoots = roots =>
+	roots.flatMap(root => getShadowRoots([...root.querySelectorAll('*')]));
 
-	// given a list of roots, returns decedent shadowRoots nested within the roots
-	let selectShadowRoots = roots => {
-		roots = selectDirectShadowRoots(roots);
-		for (let i = 0; i < roots.length; i++)
-			roots.push(...selectDirectShadowRoots([roots[i]]));
-		return roots;
-	};
+// given a list of roots, returns decedent shadowRoots nested within the roots
+let selectShadowRoots = roots => {
+	roots = selectDirectShadowRoots(roots);
+	for (let i = 0; i < roots.length; i++)
+		roots.push(...selectDirectShadowRoots([roots[i]]));
+	return roots;
+};
 
-	// given a shadowRoot, gives the edit style of the shadowRoot
-	let getShadowRootEditStyle = shadowRoot => {
-		if (shadowRoot.editStyle)
-			return shadowRoot.editStyle;
-		shadowRoot.appendChild(document.createElement('style'));
-		return shadowRoot.editStyle = shadowRoot.styleSheets[0];
-	};
+// given a shadowRoot, gives the edit style of the shadowRoot
+let getShadowRootEditStyle = shadowRoot => {
+	if (shadowRoot.editStyle)
+		return shadowRoot.editStyle;
+	shadowRoot.appendChild(document.createElement('style'));
+	return shadowRoot.editStyle = shadowRoot.styleSheets[0];
+};
 
-	document.addEventListener('DOMContentLoaded', () => {
-		[...document.styleSheets]
-			.flatMap(styleSheet => [...styleSheet.rules])
-			.forEach(rule => {
-				if (!rule.selectorText)
+document.addEventListener('DOMContentLoaded', () => {
+	[...document.styleSheets]
+		.flatMap(styleSheet => [...styleSheet.rules])
+		.forEach(rule => {
+			if (!rule.selectorText)
+				return;
+
+			if (!/\.(theme|part)[^\w-]/.test(rule.selectorText))
+				return;
+
+			let styleText = rule.cssText.match(/{(.*)}/)[1];
+
+			rule.selectorText.split(',').forEach(subSelectorText => {
+				let shadowSelects = subSelectorText
+					.split(/(\.(?:theme|partend|part))/)
+					.map(select => select.trim())
+					.filter(select => select);
+
+				if (shadowSelects.length <= 1)
 					return;
 
-				if (!/\.(theme|part)[^\w-]/.test(rule.selectorText))
-					return;
+				let roots = [document];
+				let remainderPartSelector = '';
+				let skip = 0;
 
-				let styleText = rule.cssText.match(/{(.*)}/)[1];
-
-				rule.selectorText.split(',').forEach(subSelectorText => {
-					let shadowSelects = subSelectorText
-						.split(/(\.(?:theme|partend|part))/)
-						.map(select => select.trim())
-						.filter(select => select);
-
-					if (shadowSelects.length <= 1)
+				shadowSelects.forEach((select, i) => {
+					if (skip) {
+						skip--;
 						return;
+					}
 
-					let roots = [document];
-					let remainderPartSelector = '';
-					let skip = 0;
+					let nextSelect = shadowSelects[i + 1] || '';
 
-					shadowSelects.forEach((select, i) => {
-						if (skip) {
-							skip--;
-							return;
-						}
-
-						let nextSelect = shadowSelects[i + 1] || '';
-
-						switch (select) {
-							case '.theme':
-								if (remainderPartSelector)
-									roots = queryRoots(roots, remainderPartSelector);
-								roots = selectShadowRoots(roots);
-								break;
-							case '.part':
-								if (remainderPartSelector)
-									roots = queryRoots(roots, remainderPartSelector);
-								remainderPartSelector = `[part=${nextSelect}]`;
-								skip += 2;
-								roots = getShadowRoots(roots);
-								break;
-							default:
-								remainderPartSelector += ' ' + select;
-						}
-					});
-
-					roots
-						.map(getShadowRootEditStyle)
-						.forEach(styleSheet => styleSheet.addRule(remainderPartSelector, styleText));
+					switch (select) {
+						case '.theme':
+							if (remainderPartSelector)
+								roots = queryRoots(roots, remainderPartSelector);
+							roots = selectShadowRoots(roots);
+							break;
+						case '.part':
+							if (remainderPartSelector)
+								roots = queryRoots(roots, remainderPartSelector);
+							remainderPartSelector = `[part=${nextSelect}]`;
+							skip += 2;
+							roots = getShadowRoots(roots);
+							break;
+						default:
+							remainderPartSelector += ' ' + select;
+					}
 				});
+
+				roots
+					.map(getShadowRootEditStyle)
+					.forEach(styleSheet => styleSheet.addRule(remainderPartSelector, styleText));
 			});
-	});
-}
+		});
+});
 
 /*
   LIMITATIONS
