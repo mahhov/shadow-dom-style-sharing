@@ -1,36 +1,36 @@
 {
   "name": "shadow-dom-style-sharing",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "polyfill ::part and ::theme",
   "main": "src/index.js",
   "scripts": {
-	"readme": "document ./readmeTemplate.md ./readme.md",
-	"postversion": "git push && git push --tags && npm publish",
-	"dev": "http-server . -o -a localhost -c-1"
+    "readme": "document ./readmeTemplate.md ./readme.md",
+    "postversion": "git push && git push --tags && npm publish",
+    "dev": "http-server . -o -a localhost -c-1"
   },
   "keywords": [
-	"css",
-	"shadowdom",
-	"style",
-	"part",
-	"theme"
+    "css",
+    "shadowdom",
+    "style",
+    "part",
+    "theme"
   ],
   "author": "mahhov",
   "license": "ISC",
   "devDependencies": {
-	"de-document-examples": "0.0.9",
-	"http-server": "^0.11.1"
+    "de-document-examples": "0.0.9",
+    "http-server": "^0.11.1"
   },
   "directories": {
-	"test": "test"
+    "test": "test"
   },
   "dependencies": {},
   "repository": {
-	"type": "git",
-	"url": "git+https://github.com/mahhov/shadow-dom-style-sharing.git"
+    "type": "git",
+    "url": "git+https://github.com/mahhov/shadow-dom-style-sharing.git"
   },
   "bugs": {
-	"url": "https://github.com/mahhov/shadow-dom-style-sharing/issues"
+    "url": "https://github.com/mahhov/shadow-dom-style-sharing/issues"
   },
   "homepage": "https://github.com/mahhov/shadow-dom-style-sharing#readme"
 }
