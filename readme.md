@@ -18,11 +18,33 @@ see `https://meowni.ca/posts/part-theme-explainer/` for more information on thes
 
 #### js: if using browserify
 
-`require('shadow-dom-style-sharing')`
+`const {process} = require('shadow-dom-style-sharing')`
 
 #### js: if using some other build bundler
 
-`import --todo--`
+`import {process} from '../node_modules_build_path/shadow-dom-style-sharing.js'
+`
+### usage `process(root, changed)`
+
+invoke `process` each time you'd like to update the styling. this will typically need to be done once the DOM loads:
+
+```html
+document.addEventListener('DOMContentLoaded', () => {
+   process(document); 
+});
+```
+
+and again when new elements are added to the DOM:
+
+```html
+let myElement = document.createElement('my-element');
+document.appendChild(myElement);
+process(document, myElement);
+```
+
+the first argument to `process` should be the root element style rules are relative to. This is typically always the document.
+
+the second argument to `process` is optional and scopes the style rules to only be added to that element. This is useful to avoid css rule duplication when invoking `process` multiple times; e.g. when dynamically adding elements to the DOM after it has loaded.
 
 ## limitations
 
@@ -86,7 +108,10 @@ at the moment, to avoid having to re-parse the css styling, we reuse the browser
 
 <!-- apply shared css styling -->
 
-<script src="../src/index.js"></script>
+<script type="module">
+	import {process} from '../src/index.js'
+	document.addEventListener('DOMContentLoaded', () => process(document));
+</script>
 
 ```
 
@@ -146,7 +171,86 @@ at the moment, to avoid having to re-parse the css styling, we reuse the browser
 
 <!-- apply shared css styling -->
 
-<script src="../src/index.js"></script>
+
+<script type="module">
+	import {process} from '../src/index.js'
+	document.addEventListener('DOMContentLoaded', () => process(document));
+</script>
+
+
+```
+
+### styling dynamically modified dom
+
+```html
+<!-- styling -->
+
+<style>
+	.theme .line-orange {
+		color: orange;
+		border: 1px solid orange;
+	}
+</style>
+
+<!-- html -->
+
+<p class="line-orange">inline black</p>
+
+<my-element></my-element>
+
+<template id="my-template">
+	<p class="line-orange">element orange</p>
+	<div id="nested-element-placeholder"></div>
+	<div part="nested-div">
+		<p class="line-orange">nested div orange</p>
+	</div>
+</template>
+
+<template id="my-element-nested">
+	<p class="line-orange">nested element orange</p>
+</template>
+
+<!-- set up custom elements -->
+
+<script>
+	customElements.define('my-element', class extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({mode: 'open'});
+			const template = document.getElementById('my-template').content.cloneNode(true);
+			this.shadowRoot.appendChild(template);
+		}
+	});
+
+	customElements.define('my-element-nested', class extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({mode: 'open'});
+			const template = document.getElementById('my-element-nested').content.cloneNode(true);
+			this.shadowRoot.appendChild(template);
+		}
+	});
+</script>
+
+<!-- apply shared css styling -->
+
+<script type="module">
+	import {process} from '../src/index.js'
+
+	document.addEventListener('DOMContentLoaded', () => process(document));
+
+	setTimeout(() => {
+		let nestedElement = document.createElement('my-element-nested');
+		document.querySelector('my-element').shadowRoot.querySelector('#nested-element-placeholder').appendChild(nestedElement);
+		process(document, nestedElement);
+	}, 500);
+
+	setTimeout(() => {
+		let nestedElement = document.createElement('my-element-nested');
+		document.querySelector('my-element').shadowRoot.querySelector('#nested-element-placeholder').appendChild(nestedElement);
+		process(document, nestedElement);
+	}, 1000);
+</script>
 
 ```
 
