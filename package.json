@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
 	"readme": "document ./readmeTemplate.md ./readme.md",
-	"postversion": "git push && git push --tags && npm publish"
+	"postversion": "git push && git push --tags && npm publish",
+	"dev": "http-server test -o -a localhost -c-1"
   },
   "keywords": [
 	"css",
@@ -17,7 +18,8 @@
   "author": "mahhov",
   "license": "ISC",
   "devDependencies": {
-	"de-document-examples": "0.0.9"
+	"de-document-examples": "0.0.9",
+	"http-server": "^0.11.1"
   },
   "directories": {
 	"test": "test"
