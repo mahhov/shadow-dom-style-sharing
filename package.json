@@ -6,7 +6,7 @@
   "scripts": {
 	"readme": "document ./readmeTemplate.md ./readme.md",
 	"postversion": "git push && git push --tags && npm publish",
-	"dev": "http-server test -o -a localhost -c-1"
+	"dev": "http-server . -o -a localhost -c-1"
   },
   "keywords": [
 	"css",

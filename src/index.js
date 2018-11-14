@@ -28,7 +28,11 @@ let getShadowRootEditStyle = shadowRoot => {
 	return shadowRoot.editStyle = shadowRoot.styleSheets[0];
 };
 
-let process = root =>
+// style rules will be relative to root. this will usually be `document`
+// changed (optional) scopes the elements whos style sheets will be modified.
+// typical approach, on document load, invoke `process(document)`, and whenever
+// adding an element to the DOM, invoke `process(document, myNewElement)`.
+let process = (root, changed) =>
 	[...document.styleSheets]
 		.flatMap(styleSheet => [...styleSheet.rules])
 		.forEach(rule => {
@@ -79,9 +83,14 @@ let process = root =>
 					}
 				});
 
+
 				roots
+					.filter(root => !changed || root === changed.shadowRoot)
 					.map(getShadowRootEditStyle)
-					.forEach(styleSheet => styleSheet.addRule(remainderPartSelector, styleText));
+					.forEach(styleSheet => {
+						styleSheet.addRule(remainderPartSelector, styleText)
+					});
+				window.x = roots.map(getShadowRootEditStyle).map(s => s.rules);
 			});
 		});
 
