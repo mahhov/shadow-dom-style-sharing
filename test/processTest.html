@@ -52,11 +52,7 @@
 <script type="module">
 	import {process} from '../src/index.js'
 
-	let documentLoadPromise = new Promise(resolve =>
-		document.addEventListener('DOMContentLoaded', resolve));
-
-	documentLoadPromise.then(() =>
-		process(document));
+	document.addEventListener('DOMContentLoaded', () => process(document));
 
 	setTimeout(() => {
 		let nestedElement = document.createElement('my-element-nested');

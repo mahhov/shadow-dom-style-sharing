@@ -1,4 +1,4 @@
-<script src="../src/index.js"></script>
+<!-- styling -->
 
 <style>
 	.theme .line-orange,
@@ -25,6 +25,8 @@
 	}
 
 </style>
+
+<!-- html -->
 
 <template id="my-template">
 	<p part="line-green">green</p>
@@ -57,6 +59,8 @@
 <p class="line-orange">orange</p>
 <p class="line-orange-2">orange</p>
 
+<!-- set up custom elements -->
+
 <script>
 	customElements.define('my-element', class extends HTMLElement {
 		constructor() {
@@ -75,4 +79,13 @@
 			this.shadowRoot.appendChild(template);
 		}
 	});
+</script>
+
+
+<!-- apply shared css styling -->
+
+<script type="module">
+	import {process} from '../src/index.js'
+
+	document.addEventListener('DOMContentLoaded', () => process(document));
 </script>

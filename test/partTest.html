@@ -51,4 +51,9 @@
 
 <!-- apply shared css styling -->
 
-<script src="../src/index.js"></script>
+
+<script type="module">
+	import {process} from '../src/index.js'
+	document.addEventListener('DOMContentLoaded', () => process(document));
+</script>
+
