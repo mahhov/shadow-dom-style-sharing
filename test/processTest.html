@@ -49,13 +49,4 @@
 
 <!-- apply shared css styling -->
 
-<script type="module">
-	import {process} from 'http://localhost:63342/sharedStyling/src/index.js'
-
-	let documentLoadPromise = new Promise(resolve =>
-		document.addEventListener('DOMContentLoaded', resolve));
-
-	documentLoadPromise.then(() =>
-		process(document));
-
-</script>
+<script src="../src/index.js"></script>

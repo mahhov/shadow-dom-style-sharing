@@ -28,7 +28,7 @@ let getShadowRootEditStyle = shadowRoot => {
 	return shadowRoot.editStyle = shadowRoot.styleSheets[0];
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+let process = root =>
 	[...document.styleSheets]
 		.flatMap(styleSheet => [...styleSheet.rules])
 		.forEach(rule => {
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				if (shadowSelects.length <= 1)
 					return;
 
-				let roots = [document];
+				let roots = [root];
 				let remainderPartSelector = '';
 				let skip = 0;
 
@@ -84,7 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
 					.forEach(styleSheet => styleSheet.addRule(remainderPartSelector, styleText));
 			});
 		});
-});
+
+export {process};
 
 /*
   LIMITATIONS
