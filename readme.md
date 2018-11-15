@@ -12,18 +12,21 @@ see `https://meowni.ca/posts/part-theme-explainer/` for more information on thes
 
 ### import
 
-#### html
-
-`<script src="build-path-to-shadow-dom-style-sharing/index.js"></script>`
-
-#### js: if using browserify
+#### using node modules 
 
 `const {process} = require('shadow-dom-style-sharing')`
 
-#### js: if using some other build bundler
+#### using es6 modules
 
-`import {process} from '../node_modules_build_path/shadow-dom-style-sharing.js'
-`
+`import {process} from 'build-path-to-shared-styling/es6/index.js';`
+
+#### using <es6 with no build tool
+
+```html
+<script>window.module = {};</script>
+<script src="build-path-to-shared-styling/src/index.js"></script>
+```
+
 ### usage `process(root, changed)`
 
 invoke `process` each time you'd like to update the styling. this will typically need to be done once the DOM loads:
@@ -106,10 +109,14 @@ at the moment, to avoid having to re-parse the css styling, we reuse the browser
 	});
 </script>
 
+<!-- load npm export without requiring browserify or other build tools -->
+
+<script>window.module = {};</script>
+<script src="../src/index.js"></script>
+
 <!-- apply shared css styling -->
 
-<script type="module">
-	import {process} from '../src/index.js'
+<script>
 	document.addEventListener('DOMContentLoaded', () => process(document));
 </script>
 
@@ -169,11 +176,14 @@ at the moment, to avoid having to re-parse the css styling, we reuse the browser
 	});
 </script>
 
+<!-- load npm export without requiring browserify or other build tools -->
+
+<script>window.module = {};</script>
+<script src="../src/index.js"></script>
+
 <!-- apply shared css styling -->
 
-
-<script type="module">
-	import {process} from '../src/index.js'
+<script>
 	document.addEventListener('DOMContentLoaded', () => process(document));
 </script>
 
@@ -232,11 +242,14 @@ at the moment, to avoid having to re-parse the css styling, we reuse the browser
 	});
 </script>
 
+<!-- load npm export without requiring browserify or other build tools -->
+
+<script>window.module = {};</script>
+<script src="../src/index.js"></script>
+
 <!-- apply shared css styling -->
 
-<script type="module">
-	import {process} from '../src/index.js'
-
+<script>
 	document.addEventListener('DOMContentLoaded', () => process(document));
 
 	setTimeout(() => {
