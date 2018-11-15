@@ -47,11 +47,14 @@
 	});
 </script>
 
+<!-- load npm export without requiring browserify or other build tools -->
+
+<script>window.module = {};</script>
+<script src="../src/index.js"></script>
+
 <!-- apply shared css styling -->
 
-<script type="module">
-	import {process} from '../src/index.js'
-
+<script>
 	document.addEventListener('DOMContentLoaded', () => process(document));
 
 	setTimeout(() => {

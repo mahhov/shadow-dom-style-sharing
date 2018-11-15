@@ -94,7 +94,7 @@ let process = (root, changed) =>
 			});
 		});
 
-export {process};
+module.exports = {process};
 
 /*
   LIMITATIONS
