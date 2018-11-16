@@ -12,11 +12,11 @@ see `https://meowni.ca/posts/part-theme-explainer/` for more information on thes
 
 ### import
 
-#### using node modules 
+#### using as a node modules 
 
 `const {process} = require('shadow-dom-style-sharing')`
 
-#### using es6 modules
+#### using as a es6 modules
 
 `import {process} from 'build-path-to-shared-styling/es6/index.js';`
 

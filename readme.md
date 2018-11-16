@@ -12,11 +12,11 @@ see `https://meowni.ca/posts/part-theme-explainer/` for more information on thes
 
 ### import
 
-#### using node modules 
+#### using as a node modules 
 
 `const {process} = require('shadow-dom-style-sharing')`
 
-#### using es6 modules
+#### using as a es6 modules
 
 `import {process} from 'build-path-to-shared-styling/es6/index.js';`
 
@@ -109,14 +109,10 @@ at the moment, to avoid having to re-parse the css styling, we reuse the browser
 	});
 </script>
 
-<!-- load npm export without requiring browserify or other build tools -->
-
-<script>window.module = {};</script>
-<script src="../src/index.js"></script>
-
 <!-- apply shared css styling -->
 
-<script>
+<script type="module">
+	import {process} from '../es6/index.js';
 	document.addEventListener('DOMContentLoaded', () => process(document));
 </script>
 
@@ -176,14 +172,10 @@ at the moment, to avoid having to re-parse the css styling, we reuse the browser
 	});
 </script>
 
-<!-- load npm export without requiring browserify or other build tools -->
-
-<script>window.module = {};</script>
-<script src="../src/index.js"></script>
-
 <!-- apply shared css styling -->
 
-<script>
+<script type="module">
+	import {process} from '../es6/index.js';
 	document.addEventListener('DOMContentLoaded', () => process(document));
 </script>
 
@@ -242,14 +234,11 @@ at the moment, to avoid having to re-parse the css styling, we reuse the browser
 	});
 </script>
 
-<!-- load npm export without requiring browserify or other build tools -->
-
-<script>window.module = {};</script>
-<script src="../src/index.js"></script>
-
 <!-- apply shared css styling -->
 
-<script>
+<script type="module">
+	import {process} from '../es6/index.js';
+
 	document.addEventListener('DOMContentLoaded', () => process(document));
 
 	setTimeout(() => {

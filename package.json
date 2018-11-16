@@ -5,6 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "readme": "document ./readmeTemplate.md ./readme.md",
+    "es6-build": "node2es6 src/index.js es6/index.js",
+    "prepare": "npm run readme && npm run es6-build",
     "postversion": "git push && git push --tags && npm publish",
     "dev": "http-server . -o -a localhost -c-1"
   },
@@ -19,7 +21,8 @@
   "license": "ISC",
   "devDependencies": {
     "de-document-examples": "0.0.9",
-    "http-server": "^0.11.1"
+    "http-server": "^0.11.1",
+    "node2es6": "^1.0.0"
   },
   "directories": {
     "test": "test"

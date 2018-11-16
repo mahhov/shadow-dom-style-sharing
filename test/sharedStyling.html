@@ -81,13 +81,10 @@
 	});
 </script>
 
-<!-- load npm export without requiring browserify or other build tools -->
-
-<script>window.module = {};</script>
-<script src="../src/index.js"></script>
 
 <!-- apply shared css styling -->
 
-<script>
+<script type="module">
+	import {process} from '../es6/index.js';
 	document.addEventListener('DOMContentLoaded', () => process(document));
 </script>
